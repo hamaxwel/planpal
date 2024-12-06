@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlanPal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen">
+        <h1 class="app-name">PlanPal</h1>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+    </div>
+
+    <div class="container" style="display: none;" id="main-container">
+        <h1>PlanPal - Productivity Planner</h1>
+
+        <!-- Main Screen -->
+        <section id="main-screen">
+            <!-- Task input form -->
+            <form action="/add" method="POST">
+                <label for="task_name">Task Name:</label>
+                <input type="text" id="task_name" name="task_name" placeholder="Task Name" required>
+                
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+                
+                <label for="time">Time:</label>
+                <input type="time" id="time" name="time" required>
+                
+                <label for="category">Category:</label>
+                <select id="category" name="category">
+                    <option value="">Select Category (Optional)</option>
+                    <option value="Work">Work</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Fitness">Fitness</option>
+                </select>
+                
+                <label for="completed">Completed:</label>
+                <input type="checkbox" id="completed" name="completed" value="true">
+                
+                <button type="submit">Add Task</button>
+            </form>
+
+            <!-- Task list -->
+            <ul class="task-list">
+                {% for task in tasks %}
+                <li class="task-item {% if task.status == 'completed' %} completed {% endif %}">
+                    <span>{{ task.task_name }} - {{ task.date }} - {{ task.category }} - {{ task.status }}</span>
+
+                    {% if task.status == 'in-progress' %}
+                    <a href="/complete/{{ task.id }}" class="mark-complete-link">Mark as Completed</a>
+                    {% endif %}
+
+                    <a href="/delete/{{ task.id }}" class="delete-task-link" onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                    
+                    <!-- Edit Link -->
+                    <a href="/edit/{{ task.id }}" class="edit-task-link">Edit</a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <!-- Task Status Summary -->
+            <h2>Task Status Summary</h2>
+            <canvas id="taskChart" width="400" height="400"></canvas>
+
+            <!-- Overall Productivity -->
+            <h1>My Productivity</h1>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: {{ completed_percentage }}%"></div>
+            </div>
+            <p>{{ completed_percentage }}% of your tasks are completed!</p>
+
+  <!-- Show remaining tasks -->
+  <p>You have {{ remaining_tasks }} task(s) remaining.</p>
+
+  {% if remaining_tasks > 0 %}
+      <h3>Remaining Tasks:</h3>
+      <ul>
+          {% for task in in_progress_tasks %}
+              <li>{{ task.task_name }} - {{ task.date }} {{ task.time }} - {{ task.category }}</li>
+          {% endfor %}
+      </ul>
+      <p>{{ remaining_percentage }} of your tasks are still pending.</p>
+  {% else %}
+      <p>All tasks are completed!</p>
+  {% endif %}
+
+            <!-- My Tasks Today -->
+            <section id="today-tasks-screen">
+                <h2>My Tasks Today</h2>
+                <div id="today-tasks-container"></div>
+            </section>
+            
+          
+        </div>
+
+    <script>
+        // Show main screen from intro
+        function showMainScreen() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('main-container').style.display = 'block';
+        }
+
+        // Initialize Chart.js
+        function initializeTaskChart() {
+            const ctx = document.getElementById('taskChart').getContext('2d');
+            const taskData = {
+                labels: ['Completed', 'In Progress'],
+                datasets: [{
+                    data: [{{ completed_tasks | length }}, {{ in_progress_tasks | length }}],
+                    backgroundColor: ['#4CAF50', '#FFC107'],
+                }]
+            };
+            new Chart(ctx, {
+                type: 'pie',
+                data: taskData
+            });
+        }
+
+        // Display Today's Tasks
+        function displayTodaysTasks() {
+            const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+            const todayTasksContainer = document.getElementById('today-tasks-container');
+            
+            // Filter tasks that are scheduled for today
+            const todayTasks = {{ tasks | tojson }}.filter(task => task.date === today);
+            
+            if (todayTasks.length > 0) {
+                todayTasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.classList.add('task-item');
+                    taskElement.innerHTML = 
+                        `<h4>${task.task_name}</h4>
+                        <p><strong>Category:</strong> ${task.category || 'No Category'}</p>
+                        <p><strong>Time:</strong> ${task.time}</p>
+                        <p><strong>Status:</strong> ${task.status}</p>`;
+                    todayTasksContainer.appendChild(taskElement);
+                });
+            } else {
+                todayTasksContainer.innerHTML = '<p>No tasks for today.</p>';
+            }
+        }
+
+        // Call the functions
+        window.onload = function () {
+            setTimeout(function () {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                initializeTaskChart();
+                displayTodaysTasks(); // Show today's tasks when the page loads
+            }, 1500); // Simulate 1.5 seconds loading time
+        };
+    </script>
+</body>
+</html>

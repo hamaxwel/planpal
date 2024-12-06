@@ -1,0 +1,48 @@
+[
+    {
+        "task_name": "wash my cloth",
+        "date": "2222-02-22",
+        "category": "Work",
+        "status": "in-progress"
+    },
+    {
+        "task_name": "go to the gym",
+        "date": "2222-02-22",
+        "category": "Fitness",
+        "status": "completed"
+    },
+    {
+        "task_name": "wash my clothes",
+        "date": "2222-02-22",
+        "category": "Personal",
+        "status": "completed"
+    },
+    {
+        "task_name": "jiii",
+        "date": "2024-12-05",
+        "category": "Work",
+        "status": "completed"
+    },
+    {
+        "task_name": "drink water",
+        "date": "2222-02-22",
+        "time": "06:06",
+        "category": "Personal",
+        "status": "in-progress"
+    },
+    {
+        "task_name": "rrr",
+        "date": "3333-03-31",
+        "time": "14:22",
+        "category": "Personal",
+        "status": "in-progress"
+    },
+    {
+        "task_name": "jog",
+        "date": "2024-12-06",
+        "category": "Fitness",
+        "status": "in-progress",
+        "amount": "",
+        "transaction_description": ""
+    }
+]
