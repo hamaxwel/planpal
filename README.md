@@ -60,7 +60,6 @@ python3 app.py
 │   └── summary.html   # Task summary page template
 ├── static/            # Folder for static files (CSS, JS, images)
 │   ├── style.css      # Custom styles
-│   └── script.js      # JavaScript functionality
 └── requirements.txt   # List of dependencies
 ```
 
